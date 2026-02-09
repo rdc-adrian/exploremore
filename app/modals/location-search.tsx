@@ -1,4 +1,4 @@
-import { View, Text } from "react-native";
+import { Text, View } from "react-native";
 
 // Modal for searching and selecting locations.
 export default function LocationSearchModal() {

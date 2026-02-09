@@ -1,4 +1,4 @@
-import { View, Text } from "react-native";
+import { Text, View } from "react-native";
 
 // Date selection screen for trip creation.
 export default function SelectDates() {

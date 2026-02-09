@@ -1,4 +1,4 @@
-import { View, Text } from "react-native";
+import { Text, View } from "react-native";
 
 // About page with app version and legal links.
 export default function AboutScreen() {

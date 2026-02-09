@@ -1,4 +1,4 @@
-import { View, Text } from "react-native";
+import { Text, View } from "react-native";
 
 // Onboarding preferences to customize suggestions and units.
 export default function OnboardingPreferences() {

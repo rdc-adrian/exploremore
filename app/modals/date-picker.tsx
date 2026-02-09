@@ -1,4 +1,4 @@
-import { View, Text } from "react-native";
+import { Text, View } from "react-native";
 
 // Modal for picking dates in various flows.
 export default function DatePickerModal() {

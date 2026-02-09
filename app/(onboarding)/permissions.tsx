@@ -1,4 +1,4 @@
-import { View, Text } from "react-native";
+import { Text, View } from "react-native";
 
 // Requests location/notifications permissions needed for ExploreMore.
 export default function PermissionsScreen() {

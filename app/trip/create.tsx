@@ -1,4 +1,4 @@
-import { View, Text } from "react-native";
+import { Text, View } from "react-native";
 
 // Start a new trip creation flow.
 export default function CreateTrip() {

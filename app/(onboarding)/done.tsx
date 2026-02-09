@@ -1,4 +1,4 @@
-import { View, Text } from "react-native";
+import { Text, View } from "react-native";
 
 // Final onboarding screen confirming setup completion.
 export default function OnboardingDone() {

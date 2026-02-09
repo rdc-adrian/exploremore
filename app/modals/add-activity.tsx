@@ -1,4 +1,4 @@
-import { View, Text } from "react-native";
+import { Text, View } from "react-native";
 
 // Modal to add an activity to an itinerary or plan.
 export default function AddActivityModal() {

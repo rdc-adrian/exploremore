@@ -1,4 +1,4 @@
-import { View, Text } from "react-native";
+import { Text, View } from "react-native";
 
 // Notifications preferences for app alerts and reminders.
 export default function NotificationsSettings() {

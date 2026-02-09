@@ -1,4 +1,4 @@
-import { View, Text } from "react-native";
+import { Text, View } from "react-native";
 
 // Modal to warn about unsaved changes and confirm exit.
 export default function ConfirmExitModal() {
