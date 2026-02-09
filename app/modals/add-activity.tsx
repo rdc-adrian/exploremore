@@ -1,8 +1,10 @@
 import { View, Text } from "react-native";
-export default function NewTrip() {
+
+// Modal to add an activity to an itinerary or plan.
+export default function AddActivityModal() {
   return (
     <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-      <Text>Create a New Trip</Text>
+      <Text>Add activity modal placeholder</Text>
     </View>
   );
 }
