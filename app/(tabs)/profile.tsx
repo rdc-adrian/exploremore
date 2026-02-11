@@ -1,82 +1,82 @@
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { colors, spacing, typography } from "@/theme";
+import {
+  Image,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-// TODO: Replace with real user data (API, DB, Auth, etc.)
 const mockUser = {
-  name: "Adrian Explorer",
-  email: "adrian@example.com",
+  name: "Alex Explorer",
+  email: "alex@example.com",
   tripsCreated: 5,
   tripsCompleted: 3,
   savedPlaces: 12,
 };
 
 export default function ProfileScreen() {
+  const insets = useSafeAreaInsets();
+
   return (
-    <View style={{ flex: 1 }}>
-      <ScrollView style={{ flex: 1, padding: 16 }}>
+    <View style={styles.root}>
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={{
+          paddingTop: insets.top + spacing.md,
+          paddingBottom: insets.bottom + spacing.md,
+        }}
+      >
         {/* Profile Header */}
-        <View style={{ alignItems: "center", marginBottom: 24 }}>
-          <View
-            style={{
-              width: 80,
-              height: 80,
-              borderRadius: 40,
-              backgroundColor: "#ddd",
-              marginBottom: 12,
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <Text>Avatar</Text>
-          </View>
-          <Text style={{ fontSize: 20, fontWeight: "bold" }}>
-            {mockUser.name}
-          </Text>
-          <Text style={{ color: "gray" }}>{mockUser.email}</Text>
+        <View style={styles.header}>
+          <Image
+            source={require("@/assets/images/exploremore-avatar.png")}
+            style={styles.avatar}
+          />
+          <Text style={typography.screenTitle}>{mockUser.name}</Text>
+          <Text style={typography.helper}>{mockUser.email}</Text>
           <Pressable onPress={() => console.log("Edit Profile pressed")}>
-            <Text style={{ color: "blue", marginTop: 8 }}>Edit Profile</Text>
+            <Text
+              style={[
+                typography.helper,
+                { color: colors.primary, marginTop: spacing.sm },
+              ]}
+            >
+              Edit Profile
+            </Text>
           </Pressable>
         </View>
 
         {/* Quick Stats */}
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-around",
-            marginBottom: 24,
-          }}
-        >
-          <View style={{ alignItems: "center" }}>
-            <Text style={{ fontWeight: "bold" }}>{mockUser.tripsCreated}</Text>
-            <Text>Trips Created</Text>
+        <View style={styles.statsRow}>
+          <View style={styles.stat}>
+            <Text style={typography.sectionTitle}>{mockUser.tripsCreated}</Text>
+            <Text style={typography.helper}>Trips Created</Text>
           </View>
-          <View style={{ alignItems: "center" }}>
-            <Text style={{ fontWeight: "bold" }}>
+          <View style={styles.stat}>
+            <Text style={typography.sectionTitle}>
               {mockUser.tripsCompleted}
             </Text>
-            <Text>Trips Completed</Text>
+            <Text style={typography.helper}>Trips Completed</Text>
           </View>
-          <View style={{ alignItems: "center" }}>
-            <Text style={{ fontWeight: "bold" }}>{mockUser.savedPlaces}</Text>
-            <Text>Saved Places</Text>
+          <View style={styles.stat}>
+            <Text style={typography.sectionTitle}>{mockUser.savedPlaces}</Text>
+            <Text style={typography.helper}>Saved Places</Text>
           </View>
         </View>
 
         {/* My Trips Shortcut */}
         <Pressable
+          style={styles.listItem}
           onPress={() => console.log("My Trips pressed")}
-          style={{
-            paddingVertical: 12,
-            borderBottomWidth: 1,
-            borderColor: "lightgray",
-            flexDirection: "row",
-            justifyContent: "space-between",
-          }}
         >
           <View>
-            <Text style={{ fontWeight: "bold" }}>My Trips</Text>
-            <Text style={{ color: "gray" }}>View and manage all trips</Text>
+            <Text style={typography.body}>My Trips</Text>
+            <Text style={typography.helper}>View and manage all trips</Text>
           </View>
-          <Text style={{ color: "gray" }}>›</Text>
+          <Text style={typography.helper}>›</Text>
         </Pressable>
 
         {/* Preferences Section */}
@@ -122,36 +122,26 @@ export default function ProfileScreen() {
         </View>
 
         {/* Saved Content */}
-        <View style={{ marginBottom: 24 }}>
-          <Text style={{ fontSize: 18, fontWeight: "bold", marginBottom: 12 }}>
-            Saved Content
-          </Text>
+        <View style={styles.section}>
+          <Text style={typography.sectionTitle}>Saved Content</Text>
           {[
             { title: "Saved Destinations", count: 4 },
             { title: "Saved Ideas", count: 7 },
           ].map((item, idx) => (
             <Pressable
               key={idx}
+              style={styles.listItem}
               onPress={() => console.log(`${item.title} pressed`)}
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                paddingVertical: 12,
-                borderBottomWidth: 1,
-                borderColor: "lightgray",
-              }}
             >
-              <Text>{item.title}</Text>
-              <Text style={{ color: "gray" }}>{item.count}</Text>
+              <Text style={typography.body}>{item.title}</Text>
+              <Text style={typography.helper}>{item.count}</Text>
             </Pressable>
           ))}
         </View>
 
         {/* Support & Info */}
-        <View style={{ marginBottom: 24 }}>
-          <Text style={{ fontSize: 18, fontWeight: "bold", marginBottom: 12 }}>
-            Support & Info
-          </Text>
+        <View style={styles.section}>
+          <Text style={typography.sectionTitle}>Support & Info</Text>
           {[
             "Help & Support",
             "Privacy Policy",
@@ -160,43 +150,87 @@ export default function ProfileScreen() {
           ].map((item, idx) => (
             <Pressable
               key={idx}
+              style={styles.listItem}
               onPress={() => console.log(`${item} pressed`)}
-              style={{
-                paddingVertical: 12,
-                borderBottomWidth: 1,
-                borderColor: "lightgray",
-              }}
             >
-              <Text>{item}</Text>
+              <Text style={typography.body}>{item}</Text>
             </Pressable>
           ))}
+        </View>
+
+        {/* Logo Footer */}
+        <View style={styles.logoFooter}>
+          <Image
+            source={require("@/assets/images/exploremore-logo.png")}
+            style={styles.logo}
+          />
         </View>
       </ScrollView>
 
       {/* Sign Out */}
-      <View
-        style={{
-          padding: 16,
-          borderTopWidth: 1,
-          borderColor: "lightgray",
-          backgroundColor: "#f9f9f9",
-        }}
-      >
+      <View style={styles.signOutContainer}>
         <Pressable
+          style={styles.signOutButton}
           onPress={() => console.log("Sign Out pressed")}
-          style={{
-            padding: 12,
-            borderRadius: 6,
-            backgroundColor: "#fee",
-          }}
         >
-          <Text
-            style={{ color: "red", fontWeight: "bold", textAlign: "center" }}
-          >
-            Sign Out
-          </Text>
+          <Text style={styles.signOutText}>Sign Out</Text>
         </Pressable>
       </View>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  root: { flex: 1, backgroundColor: colors.backgroundAlt },
+  scroll: { flex: 1, paddingHorizontal: spacing.md },
+  header: { alignItems: "center", marginBottom: spacing.lg },
+  avatar: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    marginBottom: spacing.md,
+    resizeMode: "contain",
+  },
+  statsRow: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    marginBottom: spacing.lg,
+  },
+  stat: { alignItems: "center" },
+  section: { marginBottom: spacing.lg },
+  listItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingVertical: spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.divider,
+  },
+  logoFooter: {
+    alignItems: "center",
+    marginTop: spacing.lg,
+    marginBottom: spacing.lg,
+  },
+  logo: {
+    width: "60%",
+    height: 50,
+    resizeMode: "contain",
+    marginBottom: spacing.xs,
+  },
+  signOutContainer: {
+    padding: spacing.md,
+    borderTopWidth: 1,
+    borderColor: colors.divider,
+    backgroundColor: colors.surface,
+  },
+  signOutButton: {
+    padding: spacing.md,
+    borderRadius: 6,
+    backgroundColor: "#fee",
+  },
+  signOutText: {
+    color: "red",
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+});

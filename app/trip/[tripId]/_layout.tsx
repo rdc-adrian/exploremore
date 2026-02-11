@@ -1,6 +1,8 @@
+import { colors, spacing, typography } from "@/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { Tabs, useLocalSearchParams, useRouter } from "expo-router";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 // TODO: Replace with real trip data fetching (API, DB, AsyncStorage, etc.)
 const mockTripData = {
@@ -20,37 +22,42 @@ const tabIcons: Record<string, keyof typeof Ionicons.glyphMap> = {
 export default function TripLayout() {
   const { tripId } = useLocalSearchParams();
   const router = useRouter();
+  const insets = useSafeAreaInsets();
 
-  // TODO: Fetch trip metadata using tripId
   const trip = mockTripData;
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={styles.root}>
       {/* Persistent Trip Header */}
       <View
-        style={{
-          padding: 16,
-          borderBottomWidth: 1,
-          borderColor: "gray",
-          backgroundColor: "#f9f9f9",
-        }}
+        style={[
+          styles.header,
+          {
+            paddingTop: insets.top + spacing.sm,
+          },
+        ]}
       >
         {/* Back button always returns to My Trips list */}
         <Pressable onPress={() => router.replace("/trips")}>
-          <Text style={{ color: "blue" }}>← Back</Text>
+          <Text style={{ color: colors.primary }}>← Back</Text>
         </Pressable>
 
         {/* Trip identity */}
-        <Text style={{ fontSize: 20, fontWeight: "bold", marginTop: 8 }}>
+        <Text style={[typography.screenTitle, { marginTop: spacing.sm }]}>
           {trip?.name || "Trip"}
         </Text>
-        <Text style={{ marginTop: 4 }}>{trip?.dateRange || "Date range"}</Text>
+        <Text style={typography.helper}>{trip?.dateRange || "Date range"}</Text>
       </View>
 
       {/* Trip Sub-Navigation (Top Tabs scoped to this trip) */}
       <Tabs
         screenOptions={({ route }) => ({
-          tabBarStyle: { borderBottomWidth: 1, borderColor: "gray" },
+          tabBarStyle: {
+            borderBottomWidth: 1,
+            borderColor: colors.divider,
+            paddingBottom: insets.bottom, // respect bottom safe area
+            backgroundColor: colors.surface,
+          },
           tabBarLabelStyle: { fontSize: 14, fontWeight: "bold" },
           tabBarIcon: ({ color, size }) => (
             <Ionicons
@@ -70,3 +77,14 @@ export default function TripLayout() {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  root: { flex: 1, backgroundColor: colors.backgroundAlt },
+  header: {
+    paddingHorizontal: spacing.md,
+    paddingBottom: spacing.md,
+    borderBottomWidth: 1,
+    borderColor: colors.divider,
+    backgroundColor: colors.surface,
+  },
+});

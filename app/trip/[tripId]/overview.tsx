@@ -1,142 +1,206 @@
-import { useLocalSearchParams, useRouter } from "expo-router";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { useTrip } from "@/store/TripContext";
+import { colors, spacing, typography } from "@/theme";
+import { Activity, Day, Trip } from "@/types/trip";
+import { calculateTotalDays } from "@/utils/date";
+import { formatStatus } from "@/utils/format";
+
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 export default function TripOverview() {
-  const { tripId } = useLocalSearchParams();
-  const router = useRouter();
+  const { trip } = useTrip();
 
-  // TODO: Fetch real trip data using tripId (API, DB, AsyncStorage, etc.)
-  const mockTrip = {
-    name: "Summer in Italy",
-    destination: "Rome, Italy",
-    dateRange: "Jun 10 – Jun 20, 2026",
-    status: "Planning",
-    progress: 60,
-    checklist: [
-      { label: "Dates selected", done: true },
-      { label: "Destination confirmed", done: true },
-      { label: "Itinerary started", done: false },
-      { label: "Bookings added", done: false },
-    ],
-    upcoming: [
-      { day: "Day 1 – Arrival", items: ["Airport → Hotel", "Evening walk"] },
-      { day: "Day 2 – City Highlights", items: ["Museum", "Food market"] },
-    ],
-    savedPlaces: ["Colosseum", "Trevi Fountain", "Vatican Museums"],
-    notes: ["Check visa requirements", "Book train tickets"],
-  };
+  if (!trip.segments || trip.segments.length === 0) {
+    return (
+      <View style={styles.container}>
+        <Text style={typography.helper}>No trip segments available</Text>
+      </View>
+    );
+  }
+
+  const destinations = trip.segments
+    .map((s) => s.destination.city || s.destination.country)
+    .join(" → ");
+
+  const totalDays = calculateTotalDays(trip);
+  const upcomingDays: Day[] = trip.segments
+    .flatMap((seg) => seg.days)
+    .slice(0, 2);
+  const savedPlaces: Activity[] = trip.segments
+    .flatMap((seg) => seg.days.flatMap((d) => d.activities))
+    .filter((act) => act.type === "place")
+    .slice(0, 3);
 
   return (
-    <ScrollView style={{ flex: 1, padding: 20 }}>
-      {/* Trip Summary */}
-      <View style={{ marginBottom: 20 }}>
-        <Text style={{ fontSize: 18, fontWeight: "bold", marginBottom: 5 }}>
-          Trip Summary
-        </Text>
-        <Text>{mockTrip.name}</Text>
-        <Text>Destination: {mockTrip.destination}</Text>
-        <Text>Date Range: {mockTrip.dateRange}</Text>
-        <Text>Status: {mockTrip.status}</Text>
-      </View>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.scrollContent}
+    >
+      <TripSummaryCard
+        title={trip.title}
+        destinations={destinations}
+        dateRange={`${trip.startDate} – ${trip.endDate}`}
+        totalDays={totalDays}
+        status={trip.status}
+      />
 
-      {/* Trip Progress */}
-      <View style={{ marginBottom: 20 }}>
-        <Text style={{ fontSize: 18, fontWeight: "bold", marginBottom: 5 }}>
-          Trip Progress
-        </Text>
-        <Text>[■■■■■■□□□□] {mockTrip.progress}% Planned</Text>
-        {mockTrip.checklist.map((item, idx) => (
-          <Text key={idx}>
-            {item.done ? "✔" : "○"} {item.label}
-          </Text>
-        ))}
-      </View>
-
-      {/* Quick Actions */}
-      <View style={{ marginBottom: 20 }}>
-        <Text style={{ fontSize: 18, fontWeight: "bold", marginBottom: 5 }}>
-          Quick Actions
-        </Text>
-        {/* Planning actions */}
-        <Pressable
-          onPress={() =>
-            router.push({
-              pathname: "/trip/[tripId]/itinerary",
-              params: { tripId: tripId as string },
-            })
-          }
-        >
-          <Text style={{ color: "blue" }}>+ Add Day Plan</Text>
-        </Pressable>
-        <Pressable
-          onPress={() =>
-            router.push({
-              pathname: "/trip/[tripId]/plan",
-              params: { tripId: tripId as string },
-            })
-          }
-        >
-          <Text style={{ color: "blue" }}>+ Add Place</Text>
-        </Pressable>
-
-        {/* Capture / reminder actions */}
-        <Pressable onPress={() => console.log("TODO: Add Note screen")}>
-          <Text style={{ color: "blue" }}>+ Add Note</Text>
-        </Pressable>
-      </View>
-
-      {/* Upcoming Plan Snapshot */}
-      <Pressable
-        onPress={() =>
-          router.push({
-            pathname: "/trip/[tripId]/itinerary",
-            params: { tripId: tripId as string },
-          })
-        }
-        style={{ marginBottom: 20 }}
-      >
-        <Text style={{ fontSize: 18, fontWeight: "bold", marginBottom: 5 }}>
-          Upcoming Plan Snapshot
-        </Text>
-        {mockTrip.upcoming.slice(0, 2).map((day, idx) => (
-          <View key={idx} style={{ marginBottom: 10 }}>
-            <Text style={{ fontWeight: "bold" }}>{day.day}</Text>
-            {day.items.map((item, i) => (
-              <Text key={i}>• {item}</Text>
-            ))}
-          </View>
-        ))}
-      </Pressable>
-
-      {/* Saved Places Preview */}
-      <View style={{ marginBottom: 20 }}>
-        <Text style={{ fontSize: 18, fontWeight: "bold", marginBottom: 5 }}>
-          Saved Places Preview
-        </Text>
-        {mockTrip.savedPlaces.slice(0, 3).map((place, idx) => (
-          <Text key={idx}>• {place}</Text>
-        ))}
-        <Pressable
-          onPress={() =>
-            router.push({
-              pathname: "/trip/[tripId]/plan",
-              params: { tripId: tripId as string },
-            })
-          }
-        >
-          <Text style={{ color: "blue", marginTop: 5 }}>View all →</Text>
-        </Pressable>
-      </View>
-
-      {/* Trip Notes / Reminders */}
-      <View style={{ marginBottom: 20 }}>
-        <Text style={{ fontSize: 18, fontWeight: "bold", marginBottom: 5 }}>
-          Trip Notes / Reminders
-        </Text>
-        {mockTrip.notes.map((note, idx) => (
-          <Text key={idx}>• {note}</Text>
-        ))}
-      </View>
+      <TripProgressCard />
+      <QuickActionsCard />
+      <UpcomingPlanPreview days={upcomingDays} />
+      <SavedPlacesPreview places={savedPlaces} />
     </ScrollView>
   );
 }
+
+/* -------------------- Local Components -------------------- */
+
+interface TripSummaryCardProps {
+  title: string;
+  destinations: string;
+  dateRange: string;
+  totalDays: number;
+  status: Trip["status"];
+}
+
+function TripSummaryCard({
+  title,
+  destinations,
+  dateRange,
+  totalDays,
+  status,
+}: TripSummaryCardProps) {
+  return (
+    <View style={styles.card}>
+      <Text style={typography.screenTitle}>Trip Summary</Text>
+      <Text style={typography.helper}>Destinations: {destinations}</Text>
+      <Text style={typography.helper}>Dates: {dateRange}</Text>
+      <Text style={typography.helper}>Total Days: {totalDays}</Text>
+      <Text style={typography.helper}>Status: {formatStatus(status)}</Text>
+    </View>
+  );
+}
+
+function TripProgressCard() {
+  return (
+    <View style={styles.card}>
+      <Text style={typography.sectionTitle}>Trip Progress</Text>
+      <View style={styles.progressBar}>
+        <View style={styles.progressFill} />
+      </View>
+      <Text style={typography.helper}>60% Planned</Text>
+      <View style={{ marginTop: spacing.sm }}>
+        <Text style={typography.body}>✔ Dates selected</Text>
+        <Text style={typography.body}>✔ Destinations confirmed</Text>
+        <Text style={typography.body}>◻ Itinerary partially planned</Text>
+        <Text style={typography.body}>◻ Bookings added</Text>
+      </View>
+    </View>
+  );
+}
+
+function QuickActionsCard() {
+  return (
+    <View style={styles.card}>
+      <Text style={typography.sectionTitle}>Quick Actions</Text>
+      <Pressable style={styles.button}>
+        <Text style={styles.buttonText}>+ Add Day Plan</Text>
+      </Pressable>
+      <Pressable style={styles.button}>
+        <Text style={styles.buttonText}>+ Add Place</Text>
+      </Pressable>
+      <Pressable style={styles.button}>
+        <Text style={styles.buttonText}>+ Add Note</Text>
+      </Pressable>
+    </View>
+  );
+}
+
+interface UpcomingPlanPreviewProps {
+  days: Day[];
+}
+
+function UpcomingPlanPreview({ days }: UpcomingPlanPreviewProps) {
+  return (
+    <View style={styles.card}>
+      <Text style={typography.sectionTitle}>Upcoming Plan</Text>
+      {days.map((day) => (
+        <View key={day.id} style={{ marginTop: spacing.sm }}>
+          <Text style={typography.body}>
+            Day {day.dayNumber} — {day.date}
+          </Text>
+          {day.activities.slice(0, 2).map((act) => (
+            <Text key={act.id} style={typography.helper}>
+              • {act.title}
+            </Text>
+          ))}
+        </View>
+      ))}
+    </View>
+  );
+}
+
+interface SavedPlacesPreviewProps {
+  places: Activity[];
+}
+
+function SavedPlacesPreview({ places }: SavedPlacesPreviewProps) {
+  return (
+    <View style={styles.card}>
+      <Text style={typography.sectionTitle}>Saved Places</Text>
+      {places.map((place) => (
+        <Text key={place.id} style={typography.helper}>
+          • {place.location?.name || place.title}
+        </Text>
+      ))}
+      <Text
+        style={[
+          typography.helper,
+          { color: colors.primary, marginTop: spacing.sm },
+        ]}
+      >
+        View all →
+      </Text>
+    </View>
+  );
+}
+
+/* -------------------- Styles -------------------- */
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.backgroundAlt,
+  },
+  scrollContent: {
+    padding: spacing.lg,
+  },
+  card: {
+    backgroundColor: colors.surface,
+    borderRadius: 8,
+    padding: spacing.md,
+    marginBottom: spacing.lg,
+  },
+  progressBar: {
+    height: 8,
+    backgroundColor: colors.divider,
+    borderRadius: 4,
+    marginVertical: spacing.sm,
+  },
+  progressFill: {
+    width: "60%",
+    height: "100%",
+    backgroundColor: colors.primary,
+    borderRadius: 4,
+  },
+  button: {
+    backgroundColor: colors.primary,
+    borderRadius: 6,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+    marginTop: spacing.sm,
+  },
+  buttonText: {
+    ...typography.body,
+    color: colors.onPrimary,
+    textAlign: "center",
+  },
+});

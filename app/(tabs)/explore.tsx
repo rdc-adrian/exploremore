@@ -1,8 +1,19 @@
+import { colors, spacing, typography } from "@/theme";
 import { router } from "expo-router";
 import { useState } from "react";
-import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import {
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function Explore() {
+  const insets = useSafeAreaInsets();
+
   // Mock data
   const featured = {
     id: "f1",
@@ -15,72 +26,64 @@ export default function Explore() {
     { id: "t2", name: "Bali", tags: ["Beach", "Nature"] },
     { id: "t3", name: "Paris", tags: ["Culture", "Food", "City"] },
   ];
-  const [saved, setSaved] = useState<any[]>([]); // mock saved ideas
+  const [saved, setSaved] = useState<any[]>([]);
   const [selectedTheme, setSelectedTheme] = useState<string | null>(null);
 
   return (
-    <ScrollView style={{ flex: 1, padding: 20 }}>
+    <ScrollView
+      style={[
+        styles.root,
+        {
+          paddingTop: insets.top + spacing.md,
+          paddingBottom: insets.bottom + spacing.md,
+        },
+      ]}
+    >
       {/* Header */}
-      <Text style={{ fontSize: 24, fontWeight: "bold" }}>Explore</Text>
-      <Text style={{ marginBottom: 10 }}>Where do you want to go?</Text>
+      <Text style={typography.screenTitle}>Explore</Text>
+      <Text style={typography.helper}>Where do you want to go?</Text>
       <TextInput
         placeholder="Search destinations or themes"
-        style={{
-          borderWidth: 1,
-          borderColor: "gray",
-          borderRadius: 5,
-          padding: 8,
-          marginBottom: 20,
-        }}
+        placeholderTextColor={colors.textSecondary}
+        style={styles.searchInput}
       />
 
       {/* Featured Section */}
-      <Text style={{ fontSize: 18, fontWeight: "bold", marginBottom: 10 }}>
-        Featured
-      </Text>
-      <View
-        style={{
-          borderWidth: 1,
-          borderColor: "gray",
-          padding: 15,
-          marginBottom: 20,
-        }}
-      >
-        <Text style={{ fontSize: 16, fontWeight: "bold" }}>
-          {featured.name}
-        </Text>
-        <Text style={{ marginBottom: 10 }}>{featured.period}</Text>
-        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+      <Text style={typography.sectionTitle}>Featured</Text>
+      <View style={styles.card}>
+        <Text style={typography.body}>{featured.name}</Text>
+        <Text style={typography.helper}>{featured.period}</Text>
+        <View style={styles.row}>
           <Pressable onPress={() => setSaved([...saved, featured])}>
-            <Text style={{ color: "blue" }}>Save</Text>
+            <Text style={{ color: colors.primary }}>Save</Text>
           </Pressable>
           <Pressable onPress={() => router.push("/trip/create")}>
-            <Text style={{ color: "blue" }}>Plan Trip</Text>
+            <Text style={{ color: colors.primary }}>Plan Trip</Text>
           </Pressable>
         </View>
       </View>
 
       {/* Browse by Theme */}
-      <Text style={{ fontSize: 18, fontWeight: "bold", marginBottom: 10 }}>
-        Browse by Theme
-      </Text>
-      <View
-        style={{ flexDirection: "row", flexWrap: "wrap", marginBottom: 20 }}
-      >
+      <Text style={typography.sectionTitle}>Browse by Theme</Text>
+      <View style={styles.themeRow}>
         {themes.map((theme) => (
           <Pressable
             key={theme}
             onPress={() => setSelectedTheme(theme)}
-            style={{
-              borderWidth: 1,
-              borderColor: selectedTheme === theme ? "blue" : "gray",
-              borderRadius: 5,
-              paddingHorizontal: 10,
-              paddingVertical: 5,
-              margin: 5,
-            }}
+            style={[
+              styles.themeButton,
+              {
+                borderColor:
+                  selectedTheme === theme ? colors.primary : colors.divider,
+              },
+            ]}
           >
-            <Text style={{ color: selectedTheme === theme ? "blue" : "black" }}>
+            <Text
+              style={{
+                color:
+                  selectedTheme === theme ? colors.primary : colors.textPrimary,
+              }}
+            >
               {theme}
             </Text>
           </Pressable>
@@ -88,28 +91,14 @@ export default function Explore() {
       </View>
 
       {/* Trending Destinations */}
-      <Text style={{ fontSize: 18, fontWeight: "bold", marginBottom: 10 }}>
-        Trending
-      </Text>
+      <Text style={typography.sectionTitle}>Trending</Text>
       {trending
         .filter((d) => !selectedTheme || d.tags.includes(selectedTheme))
         .map((dest) => (
-          <View
-            key={dest.id}
-            style={{
-              borderWidth: 1,
-              borderColor: "gray",
-              padding: 15,
-              marginBottom: 15,
-            }}
-          >
-            <Text style={{ fontSize: 16, fontWeight: "bold" }}>
-              {dest.name}
-            </Text>
-            <Text style={{ marginBottom: 10 }}>{dest.tags.join(", ")}</Text>
-            <View
-              style={{ flexDirection: "row", justifyContent: "space-between" }}
-            >
+          <View key={dest.id} style={styles.card}>
+            <Text style={typography.body}>{dest.name}</Text>
+            <Text style={typography.helper}>{dest.tags.join(", ")}</Text>
+            <View style={styles.row}>
               <Pressable
                 onPress={() =>
                   router.push({
@@ -118,10 +107,10 @@ export default function Explore() {
                   })
                 }
               >
-                <Text style={{ color: "blue" }}>View</Text>
+                <Text style={{ color: colors.primary }}>View</Text>
               </Pressable>
               <Pressable onPress={() => setSaved([...saved, dest])}>
-                <Text style={{ color: "blue" }}>Save</Text>
+                <Text style={{ color: colors.primary }}>Save</Text>
               </Pressable>
             </View>
           </View>
@@ -130,35 +119,66 @@ export default function Explore() {
       {/* Saved Ideas */}
       {saved.length > 0 ? (
         <>
-          <Text style={{ fontSize: 18, fontWeight: "bold", marginBottom: 10 }}>
-            Saved Ideas
-          </Text>
+          <Text style={typography.sectionTitle}>Saved Ideas</Text>
           {saved.map((dest) => (
-            <View
-              key={dest.id}
-              style={{
-                borderWidth: 1,
-                borderColor: "gray",
-                padding: 15,
-                marginBottom: 15,
-              }}
-            >
-              <Text style={{ fontSize: 16, fontWeight: "bold" }}>
-                {dest.name}
-              </Text>
-              <Text style={{ marginBottom: 10 }}>Saved for later</Text>
+            <View key={dest.id} style={styles.card}>
+              <Text style={typography.body}>{dest.name}</Text>
+              <Text style={typography.helper}>Saved for later</Text>
               <Pressable onPress={() => router.push("/trip/create")}>
-                <Text style={{ color: "blue" }}>Plan Trip</Text>
+                <Text style={{ color: colors.primary }}>Plan Trip</Text>
               </Pressable>
             </View>
           ))}
         </>
       ) : (
-        <View style={{ marginTop: 20 }}>
-          <Text style={{ fontWeight: "bold" }}>No saved ideas yet</Text>
-          <Text>Save destinations to plan them later</Text>
+        <View style={{ marginTop: spacing.md }}>
+          <Text style={typography.sectionTitle}>No saved ideas yet</Text>
+          <Text style={typography.helper}>
+            Save destinations to plan them later
+          </Text>
         </View>
       )}
     </ScrollView>
   );
 }
+
+const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+    backgroundColor: colors.backgroundAlt,
+    paddingHorizontal: spacing.md,
+  },
+  searchInput: {
+    borderWidth: 1,
+    borderColor: colors.divider,
+    borderRadius: 8,
+    padding: spacing.sm,
+    marginBottom: spacing.lg,
+    color: colors.textPrimary,
+  },
+  card: {
+    borderWidth: 1,
+    borderColor: colors.divider,
+    borderRadius: 8,
+    padding: spacing.md,
+    marginBottom: spacing.lg,
+    backgroundColor: colors.background,
+  },
+  row: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: spacing.sm,
+  },
+  themeRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    marginBottom: spacing.lg,
+  },
+  themeButton: {
+    borderWidth: 1,
+    borderRadius: 6,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
+    margin: spacing.xs,
+  },
+});

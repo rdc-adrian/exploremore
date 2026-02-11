@@ -8,4 +8,5 @@ export const colors = {
   textPrimary: "#222222", // dark text
   textSecondary: "#666666", // muted text
   divider: "#DDDDDD", // border/divider
+  onPrimary: "#FFFFFF", // text on primary
 };
